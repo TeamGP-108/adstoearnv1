@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - CashReward</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+        }
+        .dark-bg { background-color: #121212; }
+        .card-bg {
+            background-color: #1e1e1e;
+            border: 1px solid #2d2d2d;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+        }
+        .gradient-bg { background: linear-gradient(135deg, #ff8c00 0%, #ff6b00 100%); }
+        .card-glass {
+            background-color: #1e1e1e;
+            border: 1px solid rgba(255, 140, 0, 0.2);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+        }
+        .card-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 18px 45px rgba(255, 140, 0, 0.3);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #ff8c00 0%, #ff6b00 100%);
+            color: #ffffff;
+            font-weight: 600;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 30px rgba(255, 140, 0, 0.35);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 40px rgba(255, 140, 0, 0.45);
+        }
+        .input-modern {
+            background-color: #1a1a1a;
+            border: 1px solid #2d2d2d;
+            color: #ffffff;
+            border-radius: 0.75rem;
+            transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .input-modern:focus {
+            background-color: #1f1f1f;
+            border-color: #ff8c00;
+            box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.18);
+            outline: none;
+        }
+        .admin-page { display: none !important; }
+        .admin-page.active { display: block !important; animation: fadeIn 0.4s ease-in-out; }
+        #admin-login-page.admin-page.active { display: flex !important; }
+        .admin-tab { display: none; }
+        .admin-tab.active { display: block; animation: slideIn 0.3s ease-in-out; }
+        .stat-card {
+            background-color: #1a1a1a;
+            border: 1px solid rgba(255, 140, 0, 0.2);
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.35rem 0.85rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .badge-success { background: rgba(34, 197, 94, 0.18); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.35); }
+        .badge-warning { background: rgba(251, 191, 36, 0.18); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.35); }
+        .badge-danger { background: rgba(239, 68, 68, 0.18); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.35); }
+        nav {
+            background-color: rgba(26, 26, 26, 0.95);
+            border-bottom: 1px solid #2d2d2d;
+            backdrop-filter: blur(12px);
+        }
+        .table-row { transition: background-color 0.2s ease; }
+        .table-row:hover { background: rgba(255, 140, 0, 0.08); }
+        .nav-btn {
+            position: relative;
+            transition: color 0.2s ease;
+        }
+        .nav-btn.active {
+            color: #ff8c00;
+        }
+        .nav-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 12px;
+            right: 12px;
+            height: 3px;
+            background: linear-gradient(90deg, #ff8c00, #ff6b00);
+            border-radius: 9999px 9999px 0 0;
+        }
+        .nav-btn:hover { color: #ff8c00; }
+        .glow { box-shadow: 0 35px 60px rgba(0, 0, 0, 0.6); }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- Login Page -->
+    <div id="admin-login-page" class="min-h-screen flex items-center justify-center admin-page active p-4 dark-bg">
+        <div class="card-glass p-8 rounded-2xl w-full max-w-md glow">
+            <div class="text-center mb-8">
+                <div class="w-20 h-20 gradient-bg rounded-full mx-auto mb-4 flex items-center justify-center">
+                    <i data-lucide="shield" class="w-10 h-10 text-white"></i>
+                </div>
+                <h1 class="text-3xl font-bold bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">Admin Portal</h1>
+                <p class="text-gray-400 mt-2">Secure access required</p>
+            </div>
+            <input id="admin-password" type="password" placeholder="Enter Admin Password" class="w-full p-4 rounded-xl input-modern mb-4 text-white">
+            <button id="admin-login-btn" class="w-full p-4 rounded-xl btn-primary text-white font-bold text-lg">
+                <span class="flex items-center justify-center gap-2">
+                    <i data-lucide="log-in" class="w-5 h-5"></i>
+                    Login
+                </span>
+            </button>
+            <p class="text-center mt-6"><a href="/" class="text-orange-500 hover:text-orange-400 font-medium">← Back to App</a></p>
+        </div>
+    </div>
+
+    <!-- Main Admin Panel -->
+    <div id="admin-panel" class="admin-page dark-bg min-h-screen">
+        <!-- Header -->
+        <header class="gradient-bg shadow-lg">
+            <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
+                        <i data-lucide="shield" class="w-6 h-6 text-orange-500"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-white">CashReward Admin</h1>
+                        <p class="text-xs text-orange-100">Management Dashboard</p>
+                    </div>
+                </div>
+                <button id="admin-logout-btn" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-semibold flex items-center gap-2 transition">
+                    <i data-lucide="log-out" class="w-4 h-4"></i>
+                    Logout
+                </button>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="bg-black bg-opacity-30 border-b border-gray-800 sticky top-0 z-10 backdrop-blur-lg">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="flex space-x-1 overflow-x-auto">
+                    <button class="nav-btn admin-nav-btn active px-6 py-4 font-medium whitespace-nowrap" data-tab="dashboard-tab">
+                        <i data-lucide="layout-dashboard" class="w-4 h-4 inline mr-2"></i>Dashboard
+                    </button>
+                    <button class="nav-btn admin-nav-btn px-6 py-4 font-medium whitespace-nowrap" data-tab="users-tab">
+                        <i data-lucide="users" class="w-4 h-4 inline mr-2"></i>Users
+                    </button>
+                    <button class="nav-btn admin-nav-btn px-6 py-4 font-medium whitespace-nowrap" data-tab="withdrawals-tab">
+                        <i data-lucide="wallet" class="w-4 h-4 inline mr-2"></i>Withdrawals
+                    </button>
+                    <button class="nav-btn admin-nav-btn px-6 py-4 font-medium whitespace-nowrap" data-tab="notifications-tab">
+                        <i data-lucide="bell" class="w-4 h-4 inline mr-2"></i>Notifications
+                    </button>
+                    <button class="nav-btn admin-nav-btn px-6 py-4 font-medium whitespace-nowrap" data-tab="settings-tab">
+                        <i data-lucide="settings" class="w-4 h-4 inline mr-2"></i>Settings
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Content -->
+        <div class="max-w-7xl mx-auto px-4 py-6">
+            <!-- Dashboard Tab -->
+            <div id="dashboard-tab" class="admin-tab active">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="stat-card card-glass p-6 rounded-xl card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-400 text-sm font-medium mb-1">Total Users</p>
+                                <p id="total-users-count" class="text-4xl font-bold text-orange-500">0</p>
+                            </div>
+                            <div class="w-14 h-14 gradient-bg rounded-xl flex items-center justify-center">
+                                <i data-lucide="users" class="w-7 h-7 text-white"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card card-glass p-6 rounded-xl card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-400 text-sm font-medium mb-1">Pending Withdrawals</p>
+                                <p id="pending-withdrawals-count" class="text-4xl font-bold text-yellow-500">0</p>
+                            </div>
+                            <div class="w-14 h-14 bg-yellow-500 bg-opacity-20 rounded-xl flex items-center justify-center">
+                                <i data-lucide="clock" class="w-7 h-7 text-yellow-500"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card card-glass p-6 rounded-xl card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-400 text-sm font-medium mb-1">Active Users</p>
+                                <p id="active-users-count" class="text-4xl font-bold text-green-500">0</p>
+                            </div>
+                            <div class="w-14 h-14 bg-green-500 bg-opacity-20 rounded-xl flex items-center justify-center">
+                                <i data-lucide="user-check" class="w-7 h-7 text-green-500"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card card-glass p-6 rounded-xl card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-400 text-sm font-medium mb-1">Blocked Users</p>
+                                <p id="blocked-users-count" class="text-4xl font-bold text-red-500">0</p>
+                            </div>
+                            <div class="w-14 h-14 bg-red-500 bg-opacity-20 rounded-xl flex items-center justify-center">
+                                <i data-lucide="user-x" class="w-7 h-7 text-red-500"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users Tab -->
+            <div id="users-tab" class="admin-tab">
+                <div class="mb-4 flex justify-between items-center">
+                    <h2 class="text-2xl font-bold">User Management</h2>
+                    <input type="text" id="user-search" placeholder="Search users..." class="px-4 py-2 rounded-lg input-modern w-64">
+                </div>
+                <div class="card-glass rounded-xl overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-black bg-opacity-50">
+                                <tr>
+                                    <th class="p-4 text-left font-semibold">User</th>
+                                    <th class="p-4 text-left font-semibold">Email</th>
+                                    <th class="p-4 text-left font-semibold">Signup IP</th>
+                                    <th class="p-4 text-left font-semibold">Last Login IP</th>
+                                    <th class="p-4 text-left font-semibold">Balance</th>
+                                    <th class="p-4 text-left font-semibold">Status</th>
+                                    <th class="p-4 text-left font-semibold">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-table-body">
+                                <tr><td colspan="5" class="p-8 text-center text-gray-400">Loading users...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Withdrawals Tab -->
+            <div id="withdrawals-tab" class="admin-tab">
+                <div class="mb-4">
+                    <h2 class="text-2xl font-bold">Withdrawal Requests</h2>
+                    <p class="text-gray-400">Review and process pending withdrawals</p>
+                </div>
+                <div class="card-glass rounded-xl overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-black bg-opacity-50">
+                                <tr>
+                                    <th class="p-4 text-left font-semibold">User</th>
+                                    <th class="p-4 text-left font-semibold">Amount</th>
+                                    <th class="p-4 text-left font-semibold">Method</th>
+                                    <th class="p-4 text-left font-semibold">Details</th>
+                                    <th class="p-4 text-left font-semibold">Date</th>
+                                    <th class="p-4 text-left font-semibold">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="withdrawals-table-body">
+                                <tr><td colspan="6" class="p-8 text-center text-gray-400">Loading withdrawals...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notifications Tab -->
+            <div id="notifications-tab" class="admin-tab">
+                <div class="card-glass p-8 rounded-xl max-w-2xl mx-auto">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-12 h-12 gradient-bg rounded-xl flex items-center justify-center">
+                            <i data-lucide="megaphone" class="w-6 h-6 text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold">Send Notification</h3>
+                            <p class="text-gray-400 text-sm">Broadcast message to all users</p>
+                        </div>
+                    </div>
+                    <input id="notification-title" type="text" placeholder="Notification Title" class="w-full p-4 rounded-xl input-modern mb-4">
+                    <textarea id="notification-message" placeholder="Write your message here..." class="w-full p-4 rounded-xl input-modern mb-4 resize-none" rows="6"></textarea>
+                    <button id="send-notification-btn" class="w-full btn-primary text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2">
+                        <i data-lucide="send" class="w-5 h-5"></i>
+                        Send Notification
+                    </button>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="settings-tab" class="admin-tab">
+                <div class="card-glass p-8 rounded-xl max-w-3xl mx-auto">
+                    <h3 class="text-2xl font-bold mb-6 flex items-center gap-3">
+                        <i data-lucide="sliders" class="w-6 h-6 text-orange-500"></i>
+                        App Configuration
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label class="block text-sm font-semibold mb-2 text-gray-300">Minimum Withdrawal (Coins)</label>
+                            <input id="min-withdrawal" type="number" class="w-full p-3 rounded-lg input-modern">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold mb-2 text-gray-300">Daily Ad Limit</label>
+                            <input id="daily-ad-limit" type="number" class="w-full p-3 rounded-lg input-modern">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold mb-2 text-gray-300">Coin Value (Coins)</label>
+                            <input id="coin-value-coins" type="number" class="w-full p-3 rounded-lg input-modern">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold mb-2 text-gray-300">Coin Value (INR)</label>
+                            <input id="coin-value-inr" type="number" class="w-full p-3 rounded-lg input-modern">
+                        </div>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold mb-2 text-gray-300">Payment Methods (comma separated)</label>
+                        <input id="payment-methods" type="text" class="w-full p-3 rounded-lg input-modern" placeholder="UPI, Paytm, PhonePe">
+                    </div>
+                    <button id="save-settings-btn" class="w-full btn-primary text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2">
+                        <i data-lucide="save" class="w-5 h-5"></i>
+                        Save Settings
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Modal -->
+    <div id="custom-alert" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+        <div class="card-glass rounded-2xl p-8 w-full max-w-md glow">
+            <div class="text-center">
+                <div class="w-16 h-16 gradient-bg rounded-full mx-auto mb-4 flex items-center justify-center">
+                    <i data-lucide="info" class="w-8 h-8 text-white"></i>
+                </div>
+                <p id="alert-message" class="text-lg mb-6"></p>
+                <button id="alert-ok-btn" class="btn-primary px-8 py-3 rounded-xl font-bold text-white w-full">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        async function adminApiCall(action, data = {}) {
+            const formData = new FormData();
+            for (const key in data) {
+                formData.append(key, data[key]);
+            }
+            
+            try {
+                const response = await fetch('/admin_api/' + action, {
+                    method: 'POST',
+                    credentials: 'include',
+                    body: formData
+                });
+                return await response.json();
+            } catch (error) {
+                console.error('API Error:', error);
+                return { success: false, message: 'Network error' };
+            }
+        }
+
+        function showAdminPage(pageId) {
+            document.querySelectorAll('.admin-page').forEach(page => page.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        function showAdminTab(tabId) {
+            document.querySelectorAll('.admin-tab').forEach(tab => tab.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            
+            document.querySelectorAll('.admin-nav-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.querySelector(`[data-tab="${tabId}"]`);
+            if (activeBtn) activeBtn.classList.add('active');
+            
+            if (tabId === 'dashboard-tab') loadDashboardData();
+            if (tabId === 'users-tab') loadUsers();
+            if (tabId === 'withdrawals-tab') loadWithdrawals();
+            if (tabId === 'settings-tab') loadSettings();
+            
+            lucide.createIcons();
+        }
+
+        function showAlert(message) {
+            document.getElementById('alert-message').textContent = message;
+            document.getElementById('custom-alert').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        async function loadDashboardData() {
+            try {
+                const result = await adminApiCall('get_dashboard_data');
+                console.log('Dashboard result:', result); // Debug log
+                
+                if (result.success) {
+                    document.getElementById('total-users-count').textContent = result.total_users || 0;
+                    document.getElementById('pending-withdrawals-count').textContent = result.pending_withdrawals || 0;
+                } else {
+                    console.error('Dashboard error:', result.message);
+                    document.getElementById('total-users-count').textContent = '0';
+                    document.getElementById('pending-withdrawals-count').textContent = '0';
+                }
+                
+                // Load additional stats
+                const usersResult = await adminApiCall('get_users');
+                console.log('Users result:', usersResult); // Debug log
+                
+                if (usersResult.success && usersResult.users) {
+                    const users = usersResult.users;
+                    const userArray = Object.values(users);
+                    const activeUsers = userArray.filter(u => !u.isBlocked).length;
+                    const blockedUsers = userArray.filter(u => u.isBlocked).length;
+                    
+                    document.getElementById('active-users-count').textContent = activeUsers;
+                    document.getElementById('blocked-users-count').textContent = blockedUsers;
+                } else {
+                    document.getElementById('active-users-count').textContent = '0';
+                    document.getElementById('blocked-users-count').textContent = '0';
+                }
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+                document.getElementById('total-users-count').textContent = '0';
+                document.getElementById('pending-withdrawals-count').textContent = '0';
+                document.getElementById('active-users-count').textContent = '0';
+                document.getElementById('blocked-users-count').textContent = '0';
+                showAlert('Error loading dashboard data. Check console for details.');
+            }
+        }
+
+        async function loadUsers() {
+            const tbody = document.getElementById('users-table-body');
+            tbody.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-gray-400"><i data-lucide="loader" class="w-6 h-6 animate-spin inline"></i> Loading users...</td></tr>';
+            lucide.createIcons();
+            
+            try {
+                const result = await adminApiCall('get_users');
+                if (result.success) {
+                    const users = result.users || {};
+                    if (Object.keys(users).length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-gray-400">No users found.</td></tr>';
+                    } else {
+                        tbody.innerHTML = Object.values(users).map(user => `
+                            <tr class="table-row border-b border-gray-800">
+                                <td class="p-4">
+                                    <div class="font-semibold">${user.name || 'N/A'}</div>
+                                    <div class="text-xs text-gray-500">ID: ${user.id.substring(0, 8)}</div>
+                                </td>
+                                <td class="p-4 text-gray-300">${user.email}</td>
+                                <td class="p-4 text-gray-300 font-mono text-sm">${user.signupIp || 'N/A'}</td>
+                                <td class="p-4 text-gray-300 font-mono text-sm">${user.lastLoginIp || 'N/A'}</td>
+                                <td class="p-4">
+                                    <span class="font-bold text-orange-500">${user.balance || 0}</span>
+                                    <span class="text-gray-500 text-sm ml-1">coins</span>
+                                </td>
+                                <td class="p-4">
+                                    <span class="badge ${user.isBlocked ? 'badge-danger' : 'badge-success'}">
+                                        ${user.isBlocked ? '🚫 Blocked' : '✓ Active'}
+                                    </span>
+                                    ${!user.isVerified ? '<span class="badge badge-warning ml-2">⚠ Unverified</span>' : ''}
+                                </td>
+                                <td class="p-4">
+                                    <button onclick="toggleBlockUser('${user.id}', ${user.isBlocked})" class="px-4 py-2 rounded-lg text-sm font-semibold ${user.isBlocked ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'} transition">
+                                        ${user.isBlocked ? 'Unblock' : 'Block'}
+                                    </button>
+                                </td>
+                            </tr>
+                        `).join('');
+                    }
+                } else {
+                    showAlert('Failed to load users');
+                }
+            } catch (error) {
+                console.error('Error loading users:', error);
+                showAlert('Error loading users');
+            }
+            lucide.createIcons();
+        }
+
+        async function loadWithdrawals() {
+            const tbody = document.getElementById('withdrawals-table-body');
+            tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-gray-400"><i data-lucide="loader" class="w-6 h-6 animate-spin inline"></i> Loading withdrawals...</td></tr>';
+            lucide.createIcons();
+            
+            try {
+                const result = await adminApiCall('get_withdrawals');
+                if (result.success) {
+                    const withdrawals = result.withdrawals || {};
+                    if (Object.keys(withdrawals).length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-gray-400">No pending withdrawals.</td></tr>';
+                    } else {
+                        tbody.innerHTML = Object.values(withdrawals).map(w => `
+                            <tr class="table-row border-b border-gray-800">
+                                <td class="p-4">
+                                    <div class="font-semibold">${w.userName || 'N/A'}</div>
+                                    <div class="text-xs text-gray-500">${w.userEmail}</div>
+                                </td>
+                                <td class="p-4">
+                                    <span class="font-bold text-orange-500">${w.amount}</span>
+                                    <span class="text-gray-500 text-sm ml-1">coins</span>
+                                </td>
+                                <td class="p-4 text-gray-300">${w.method}</td>
+                                <td class="p-4 text-gray-300 font-mono text-sm">${w.paymentDetail}</td>
+                                <td class="p-4 text-gray-400 text-sm">${new Date(w.requestedAt).toLocaleDateString()}</td>
+                                <td class="p-4">
+                                    <div class="flex gap-2">
+                                        <button onclick="handleWithdrawal('${w.id}', 'completed')" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">
+                                            ✓ Approve
+                                        </button>
+                                        <button onclick="handleWithdrawal('${w.id}', 'rejected')" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">
+                                            ✗ Reject
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('');
+                    }
+                } else {
+                    showAlert('Failed to load withdrawals');
+                }
+            } catch (error) {
+                console.error('Error loading withdrawals:', error);
+                showAlert('Error loading withdrawals');
+            }
+        }
+
+        async function loadSettings() {
+            try {
+                const result = await adminApiCall('get_settings');
+                if (result.success) {
+                    const config = result.config || {};
+                    document.getElementById('min-withdrawal').value = config.minWithdrawal || 5000;
+                    document.getElementById('daily-ad-limit').value = config.dailyAdLimit || 10;
+                    document.getElementById('coin-value-coins').value = config.coinValueCoins || 1000;
+                    document.getElementById('coin-value-inr').value = config.coinValueInr || 10;
+                    document.getElementById('payment-methods').value = (config.paymentMethods || []).join(', ');
+                } else {
+                    showAlert('Failed to load settings');
+                }
+            } catch (error) {
+                console.error('Error loading settings:', error);
+                showAlert('Error loading settings');
+            }
+        }
+
+        async function toggleBlockUser(userId, isBlocked) {
+            if (!confirm(`Are you sure you want to ${isBlocked ? 'unblock' : 'block'} this user?`)) {
+                return;
+            }
+            
+            try {
+                const result = await adminApiCall('toggle_block_user', { user_id: userId, is_blocked: isBlocked });
+                if (result.success) {
+                    showAlert(`User ${isBlocked ? 'unblocked' : 'blocked'} successfully`);
+                    loadUsers();
+                    loadDashboardData();
+                } else {
+                    showAlert(result.message || 'Failed to update user');
+                }
+            } catch (error) {
+                console.error('Error toggling block:', error);
+                showAlert('Error updating user');
+            }
+        }
+
+        async function handleWithdrawal(requestId, newStatus) {
+            if (!confirm(`Are you sure you want to ${newStatus} this withdrawal?`)) {
+                return;
+            }
+            
+            try {
+                const result = await adminApiCall('handle_withdrawal', { request_id: requestId, new_status: newStatus });
+                if (result.success) {
+                    showAlert(`Withdrawal request ${newStatus} successfully`);
+                    loadWithdrawals();
+                    loadDashboardData();
+                } else {
+                    showAlert(result.message || 'Failed to update withdrawal');
+                }
+            } catch (error) {
+                console.error('Error handling withdrawal:', error);
+                showAlert('Error updating withdrawal');
+            }
+        }
+
+        async function sendNotification() {
+            const title = document.getElementById('notification-title').value;
+            const message = document.getElementById('notification-message').value;
+            
+            if (!title || !message) {
+                showAlert("Please fill in both title and message");
+                return;
+            }
+            
+            try {
+                const result = await adminApiCall('send_notification', { title, message });
+                if (result.success) {
+                    showAlert("Notification sent successfully to all users!");
+                    document.getElementById('notification-title').value = '';
+                    document.getElementById('notification-message').value = '';
+                } else {
+                    showAlert("Failed to send notification");
+                }
+            } catch (error) {
+                console.error('Error sending notification:', error);
+                showAlert('Error sending notification');
+            }
+        }
+
+        async function saveSettings() {
+            const minWithdrawal = parseInt(document.getElementById('min-withdrawal').value);
+            const dailyAdLimit = parseInt(document.getElementById('daily-ad-limit').value);
+            const coinValueCoins = parseInt(document.getElementById('coin-value-coins').value);
+            const coinValueInr = parseInt(document.getElementById('coin-value-inr').value);
+            const paymentMethods = document.getElementById('payment-methods').value;
+            
+            if (isNaN(minWithdrawal) || isNaN(dailyAdLimit) || isNaN(coinValueCoins) || isNaN(coinValueInr)) {
+                showAlert("Please enter valid numbers in all fields");
+                return;
+            }
+            
+            try {
+                const result = await adminApiCall('save_settings', {
+                    minWithdrawal,
+                    dailyAdLimit,
+                    coinValueCoins,
+                    coinValueInr,
+                    paymentMethods
+                });
+                
+                if (result.success) {
+                    showAlert("Settings saved successfully!");
+                } else {
+                    showAlert("Failed to save settings");
+                }
+            } catch (error) {
+                console.error('Error saving settings:', error);
+                showAlert('Error saving settings');
+            }
+        }
+
+        // User search functionality
+        document.getElementById('user-search')?.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#users-table-body tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+
+        // Event Listeners
+        document.getElementById('admin-login-btn').addEventListener('click', async () => {
+            const password = document.getElementById('admin-password').value;
+            if (!password) {
+                showAlert("Please enter admin password");
+                return;
+            }
+            
+            try {
+                const result = await adminApiCall('login', { password });
+                if (result.success) {
+                    showAdminPage('admin-panel');
+                    loadDashboardData();
+                } else {
+                    showAlert(result.message || "Invalid password");
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showAlert('Login failed');
+            }
+        });
+
+        document.getElementById('admin-logout-btn').addEventListener('click', async () => {
+            if (confirm('Are you sure you want to logout?')) {
+                await adminApiCall('logout');
+                showAdminPage('admin-login-page');
+                document.getElementById('admin-password').value = '';
+            }
+        });
+
+        document.getElementById('send-notification-btn').addEventListener('click', sendNotification);
+        document.getElementById('save-settings-btn').addEventListener('click', saveSettings);
+        document.getElementById('alert-ok-btn').addEventListener('click', () => {
+            document.getElementById('custom-alert').classList.add('hidden');
+        });
+
+        document.querySelectorAll('.admin-nav-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabId = btn.getAttribute('data-tab');
+                showAdminTab(tabId);
+            });
+        });
+
+        // Allow Enter key for login
+        document.getElementById('admin-password').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('admin-login-btn').click();
+            }
+        });
+
+        // Make functions global
+        window.toggleBlockUser = toggleBlockUser;
+        window.handleWithdrawal = handleWithdrawal;
+
+        // Initialize icons
+        lucide.createIcons();
+    </script>
+</body>
+</html>
